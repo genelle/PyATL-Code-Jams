@@ -1,85 +1,64 @@
 class BowlGame:
 
     def score_game(self,game):
-        game_list = game.split("|")
-
+        bowls = score_game_helper(game)
+        
         score = 0
-        strike = list()
-        spare = list()
+        
+        #Need to separate out first 10 frames and rest of game, will make below 
+        #functionality work a lot better
+        """
+        for index, bowl in enumerate(bowls):
+            if bowl == "X":
+                score += str_to_score(bowl) + str_to_score(bowls[index + 1]) + str_to_score(bowls[index+2])
+                
+            elif "/" in bowl:
+                score += str_to_score(bowl) + str_to_score(bowls[index + 1])
+                
+            elif bowl == "":
+                if bowls[index + 1] == "":
+                    break
+                else:
+                    score +=  
+        """
+    
+    
+    def str_to_score(self,score_str):
+        score_num = 0
+        if score_str == "X":
+            score_num = 10
+        elif "/" in score_str:
+            score_num = int(score_str[0])
+        else:
+            score_num = int(score_str) 
+            
+        return score_num
+            
+    
+    def score_game_helper(self,game):
+        '''
+        Helper function to set up list for easy scoring
+        Broke it out to test separately
+        '''
+        
+        #split up the frames
+        game_list = game.split("|")
+        
+        #split up the throws
         bowls = list()
-
-        while len(game_list) != 0:
-            
-            cur_score = game_list.pop(0)
-            score_to_add = 0
-            
-            if cur_score == "X":
-                pass
-            
-            
-            #TEST THIS BEFORE MOVING FORWARD
-            if "/" in cur_score:
-                score_to_add = 10
-                bowls = [int(cur_score[0]), 10 - int(cur_score[0])]
-                
-                try:
-                    if spare[-1] == True:
-                        score_to_add += bowls[0]
-                except IndexError:
-                    pass
-                spare.append(True)
-                
-            #no pins
-            elif cur_score == "--":
-                continue
-                
-            #end of game, no strikes/spares
-            #need to add ability to bowl more
-            elif cur_score == "":
-                break
-            
-            #some pins
+        for frame in game_list:
+            if frame == "X":
+                bowls.append("X")
+            elif frame == "":
+                bowls.append("")
             else:
-                try:
-                    score_to_add = int(cur_score[0]) + int(cur_score[1])
-                    bowls = [int(cur_score[0]), int(cur_score[1])]
-                    
-                except ValueError:
-                    if cur_score[0] == "-":
-                        score_to_add = int(cur_score[1])
-                        bowls = [0,int(cur_score[1])]
-                        
-                    else:
-                        score_to_add = int(cur_score[0])
-                        bowls = [int(cur_score[0]),0]
-                        
-                #spare previously
-                try:
-                    if spare[-1] == True:
-                        score_to_add += bowls[0]
-                except IndexError:
-                    pass
-                #strike previously
-                try:
-                    if strike[-1] == True:
-                        score_to_add += bowls[0] + bowls[1]
-                        
-                except IndexError:
-                    pass
+                new_frame = frame.replace("-", "0")
                 
-                strike = list()
-                spare = list()
-                bowls = list()
-
-           #if prev bowl was spare:
-            #try:
-            #    if spare[-2] == True:
-            #        score_to_add += bowls[0]
-            #except IndexError:
-            #    pass
+                if "/" in new_frame:
+                    bowls.extend(( new_frame[0] , str(10 - int( new_frame[0] )) + "/"))
+            
+                else:
+                    bowls.extend(( new_frame[0] , new_frame[1] ))
                 
-            #if prev two bowls was strike
-                
-            score += score_to_add
-            #print(score)            
-        return score
+        
+        return bowls
